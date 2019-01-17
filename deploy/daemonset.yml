@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1beta2
+kind: DaemonSet
+metadata:
+  labels:
+    app: conntrackd
+  name: conntrackd
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: conntrackd
+  template:
+    metadata:
+      labels:
+        app: conntrackd
+    spec:
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      hostNetwork: true
+      containers:
+      - image: roffe/conntrackd:v0.0.1
+        name: conntrackd
+        resources:
+          limits:
+            memory: 20Mi
+        securityContext:
+          runAsUser: 0
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_TIME
